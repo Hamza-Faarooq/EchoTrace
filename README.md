@@ -53,7 +53,13 @@ After downloading and extracting a split, build an exploratory 100-clip index an
     python scripts/build_index.py --audio-dir data/raw/clotho/development --output-dir data/index/development --split development --limit 100 --device cpu --model .cache/models/clap-htsat-unfused
     python scripts/run_eval.py --split development --captions-csv data/raw/clotho/clotho_captions_development.csv --index-dir data/index/development --max-clips 100 --device cpu --model .cache/models/clap-htsat-unfused
 
-Both commands sort file names for a repeatable subset. The evaluator checks that the requested split matches the index, supports max or mean window aggregation, writes metrics and per-caption predictions locally, and does not treat scores as probabilities. Indexes and prediction outputs are ignored by Git.
+Both commands sort file names for a repeatable subset. The evaluator checks that the requested split matches the index, supports max or mean window aggregation, writes metrics and per-caption predictions locally, and does not treat scores as probabilities. Its optional known-source-disjoint evaluation excludes only known Freesound source overlaps and reports unknown IDs separately. Indexes and prediction outputs are ignored by Git.
+
+For final work, build the evaluation index separately and run it once on the full official split. Then run the known-source-disjoint sensitivity subset by excluding evaluation clips whose sound_id appears in development or validation metadata:
+
+    python scripts/run_eval.py --split evaluation --captions-csv data/raw/clotho/clotho_captions_evaluation.csv --index-dir data/index/evaluation --metadata-csv data/raw/clotho/clotho_metadata_evaluation.csv --exclude-source-metadata-csv data/raw/clotho/clotho_metadata_development.csv data/raw/clotho/clotho_metadata_validation.csv --known-source-disjoint
+
+The sensitivity result keeps rows with unknown source IDs and reports their count separately; it does not claim those rows are source-disjoint.
 
 ## Evaluation protocol
 
@@ -72,6 +78,7 @@ Both commands sort file names for a repeatable subset. The evaluator checks that
 - [x] Run an audio-text CPU smoke check with a pinned model revision.
 - [x] Implement batched preprocessing, embeddings, index persistence, cosine retrieval, aggregation, and clip metrics with unit coverage.
 - [x] Exercise index loading and the evaluation command using a small synthetic index; this is only a wiring check.
+- [x] Add a known-source-disjoint evaluation filter that reports excluded and unknown-source clips.
 - [ ] Verify decoding with a real audio file, then benchmark a Clotho development subset.
 
 The largest near-term risks are Clotho's service restrictions, model cold-start memory on free hosting, source overlap and incomplete relevance labels, and CPU indexing time. The next step is a real development-split run after the audio files and pinned decoder dependency are available, then a validation-only aggregation ablation.

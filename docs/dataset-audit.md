@@ -30,6 +30,14 @@ Three evaluation records have known Freesound `sound_id` values that also occur 
 
 Keep the official evaluation split intact for the headline result, and report a separate sensitivity result that excludes the three evaluation records with known source IDs in development or validation. Call that a *known-source-disjoint subset*; unknown source IDs remain unaudited. Avoid using an evaluation split embedding as part of the index when evaluating validation or development queries.
 
+Run the full official evaluation first without the overlap filter. For the sensitivity result, pass the evaluation metadata plus both earlier-split metadata files:
+
+```powershell
+python scripts/run_eval.py --split evaluation --captions-csv data/raw/clotho/clotho_captions_evaluation.csv --index-dir data/index/evaluation --metadata-csv data/raw/clotho/clotho_metadata_evaluation.csv --exclude-source-metadata-csv data/raw/clotho/clotho_metadata_development.csv data/raw/clotho/clotho_metadata_validation.csv --known-source-disjoint
+```
+
+The evaluator reports how many indexed clips were excluded for a known source overlap and how many retained clips have unavailable source IDs. It does not silently label those unknown-source clips as disjoint.
+
 The helper can display these warnings and can fail strict checks with:
 
 ```powershell

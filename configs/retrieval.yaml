@@ -1,0 +1,6 @@
+# Initial retrieval defaults; tune on validation data only
+similarity: cosine
+top_k: 5
+normalize_embeddings: true
+aggregation: max
+merge_gap_seconds: 1.0

@@ -6,9 +6,9 @@ EchoTrace explores retrieval of relevant environmental audio from text queries u
 
 ## Current status
 
-The Day 1 research and baseline code is in place. It includes audio decoding, mono downmixing, explicit 48 kHz resampling, deterministic overlapping windows with source timestamps, a pinned CLAP wrapper, NumPy cosine search, and clip-level Recall@K/mAP functions. Window, resampling-logic, ranking, metric, and encoder-guard unit tests pass. The loader test uses a mocked decoder because soundfile was not installed in the local environment; real-file decoding still needs an integration check after dependencies and sample audio are available.
+The Day 1 foundation and next indexing/evaluation milestone are implemented. The code includes audio decoding, mono downmixing, explicit 48 kHz resampling, deterministic timestamped windows, batched CLAP embeddings, a local NumPy index, max/mean window aggregation, and a split-aware caption retrieval evaluator. Unit tests cover the core logic. The loader test uses a mocked decoder because soundfile was not installed locally; real-file decoding still needs an integration check.
 
-The CPU smoke check completed with 512-dimensional audio and text vectors. Its cosine similarity of 0.500575 compares one synthetic tone with one text query; it is a smoke result, not a retrieval benchmark. The model score is a similarity value, not a probability. No benchmark, deployment, index builder, Streamlit search flow, or validated event-localization result is claimed yet.
+The pinned CLAP checkpoint produced finite 512-dimensional audio and text batches on CPU. A small synthetic-index run exercised the evaluation command end to end, but its scores are not a dataset result. The separate smoke report's 0.500575 cosine compares one synthetic tone with one text query; it is not a retrieval benchmark. Scores are similarities, not probabilities. No Clotho benchmark, deployment, Streamlit search flow, or validated event-localization result is claimed yet.
 
 The first-party repository scaffold already defines module boundaries; see the [architecture notes](docs/architecture.md). More detail on model behavior, data risks, and the first experiment is in [implementation notes](docs/implementation-notes.md).
 
@@ -16,7 +16,8 @@ The first-party repository scaffold already defines module boundaries; see the [
 
 - src/audio: decoding, mono conversion, 48 kHz resampling, deterministic timestamped windows.
 - src/embeddings: reusable CLAP audio/text model wrapper.
-- src/retrieval: NumPy cosine scoring and stable top-k ranking.
+- src/embeddings/index.py: local vectors plus a row-aligned JSON manifest.
+- src/retrieval: NumPy cosine scoring, stable top-k ranking, and max/mean window aggregation.
 - src/evaluation: clip-level Recall@K and mean average precision.
 - app: Streamlit interface; it will call the library rather than own ML logic.
 - scripts: dataset inspection, model download, smoke check, indexing and evaluation entry points.
@@ -47,6 +48,13 @@ The primary research dataset is [Clotho v2.1 on Zenodo](https://zenodo.org/recor
 
 Raw audio, caption/metadata CSVs, embeddings, and model weights are ignored by Git. Clotho captions are licensed for experimental, non-commercial use and their accompanying terms prohibit providing services with them. Audio and metadata also have per-item Freesound licensing. Use Clotho for offline research only unless you obtain separate permission. The hosted demo needs self-recorded or individually cleared examples and must not serve Clotho captions or a Clotho-derived index. See the [observed data audit](docs/dataset-audit.md).
 
+After downloading and extracting a split, build an exploratory 100-clip index and run its caption queries:
+
+    python scripts/build_index.py --audio-dir data/raw/clotho/development --output-dir data/index/development --split development --limit 100 --device cpu --model .cache/models/clap-htsat-unfused
+    python scripts/run_eval.py --split development --captions-csv data/raw/clotho/clotho_captions_development.csv --index-dir data/index/development --max-clips 100 --device cpu --model .cache/models/clap-htsat-unfused
+
+Both commands sort file names for a repeatable subset. The evaluator checks that the requested split matches the index, supports max or mean window aggregation, writes metrics and per-caption predictions locally, and does not treat scores as probabilities. Indexes and prediction outputs are ignored by Git.
+
 ## Evaluation protocol
 
 - Use development for implementation and exploratory analysis.
@@ -56,16 +64,17 @@ Raw audio, caption/metadata CSVs, embeddings, and model weights are ignored by G
 - Keep clip retrieval separate from event localization. Clotho has clip captions, not verified event boundaries. Timestamp claims need a separately documented and manually checked interval set.
 - Record configuration, predictions, software versions, and measured runtime for each experiment. Do not report unrun values.
 
-## Day 1 checklist
+## Milestone checklist
 
 - [x] Inspect the existing repository and local CPU environment.
 - [x] Verify the CLAP checkpoint, Transformers API, 48 kHz sample rate, and 10-second input window limit.
 - [x] Inspect Clotho CSV fields, split counts, checksums, source overlap, and license conditions.
 - [x] Run an audio-text CPU smoke check with a pinned model revision.
-- [x] Implement the first preprocessing, embedding, cosine-search, and metric modules with unit coverage.
-- [ ] Build a reproducible local index and evaluate retrieval on a development subset.
+- [x] Implement batched preprocessing, embeddings, index persistence, cosine retrieval, aggregation, and clip metrics with unit coverage.
+- [x] Exercise index loading and the evaluation command using a small synthetic index; this is only a wiring check.
+- [ ] Verify decoding with a real audio file, then benchmark a Clotho development subset.
 
-The largest near-term risks are Clotho's service restrictions, model cold-start memory on free hosting, source overlap and incomplete relevance labels, and CPU indexing time. The next smallest milestone is to build a local development index and save predictions and metrics before adding the UI.
+The largest near-term risks are Clotho's service restrictions, model cold-start memory on free hosting, source overlap and incomplete relevance labels, and CPU indexing time. The next step is a real development-split run after the audio files and pinned decoder dependency are available, then a validation-only aggregation ablation.
 
 ## References
 

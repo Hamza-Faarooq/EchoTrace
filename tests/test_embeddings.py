@@ -21,3 +21,9 @@ class ClapEncoderInputTests(unittest.TestCase):
     def test_rejects_empty_text(self) -> None:
         with self.assertRaisesRegex(ValueError, "must not be empty"):
             self.encoder.encode_text("  ")
+        with self.assertRaisesRegex(ValueError, "at least one"):
+            self.encoder.encode_text_batch([])
+
+    def test_rejects_empty_audio_batch(self) -> None:
+        with self.assertRaisesRegex(ValueError, "at least one"):
+            self.encoder.encode_audio_batch([], sample_rate=48_000)

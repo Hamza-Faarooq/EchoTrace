@@ -38,4 +38,13 @@ No vector database is needed for a few thousand clips. A NumPy matrix multiplica
 
 ## Validation boundary
 
-The synthetic CLAP smoke run used the pinned checkpoint on CPU and succeeded. Unit tests exercise timestamp boundaries, cosine ranking, clip-level metrics, encoder input guards, and the downmix/resampling calculation. The audio-loader test stubs the decoder: soundfile was not installed in the local environment, and the Clotho audio archives were not downloaded. Verify decoding on a real audio file after installing the pinned dependencies. No index, full retrieval benchmark, temporal annotation evaluation, or deployment has been run.
+The synthetic CLAP smoke run used the pinned checkpoint on CPU and succeeded. Unit tests exercise timestamp boundaries, cosine ranking, clip-level metrics, encoder input guards, and the downmix/resampling calculation. The audio-loader test stubs the decoder: soundfile was not installed in the local environment, and the Clotho audio archives were not downloaded. Verify decoding on a real audio file after installing the pinned dependencies. No Clotho index, retrieval benchmark, temporal annotation evaluation, or deployment has been run.
+
+## Next milestone: local index and clip retrieval
+
+- src/embeddings/clap.py now supports batches of mono windows and text queries. The installed Transformers 4.42.4 processor accepted two audio arrays and two text queries; both outputs were finite 2 x 512 matrices on CPU. The official [CLAP documentation](https://huggingface.co/docs/transformers/model_doc/clap) describes the batched input_features shape and processor interface.
+- src/embeddings/index.py writes vectors to embeddings.npy and row-aligned, relative-path metadata to manifest.json. The index loader checks schema, row count, dimensions, and finite values.
+- scripts/build_index.py processes sorted files directly inside one split directory and records every deterministic window timestamp. Its limit flag creates a repeatable exploratory subset.
+- scripts/run_eval.py joins caption rows by file_name, rejects index/split mismatches, embeds captions in batches, aggregates window scores by max or mean, and reports Recall@K and mAP. Per-caption predictions are written to the ignored local results/predictions directory.
+
+Validation: 16 unit tests pass; compileall passes; the index/evaluation CLI also ran against a two-clip synthetic index to verify the end-to-end interface. The synthetic scores are only a wiring check and are not a benchmark. The model batch API was separately exercised with the pinned checkpoint on CPU. Actual audio decoding and a Clotho evaluation still have not been run because soundfile and the Clotho audio archives are unavailable in the local environment. Obtain the files through the official record after reviewing its terms, install the pinned dependency set, then run a real development subset.

@@ -1,0 +1,18 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+.env
+
+# Raw data and generated artifacts stay local
+data/raw/
+data/processed/
+data/index/
+*.npy
+manifest.json
+
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

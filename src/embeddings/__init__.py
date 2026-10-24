@@ -1,1 +1,5 @@
-"""CLAP embedding generation and caching."""
+"""CLAP embedding generation."""
+
+from .clap import ClapEncoder
+
+__all__ = ["ClapEncoder"]

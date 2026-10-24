@@ -5,7 +5,6 @@ __pycache__/
 venv/
 .env
 
-# Raw data and generated artifacts stay local
 data/raw/
 data/processed/
 data/index/

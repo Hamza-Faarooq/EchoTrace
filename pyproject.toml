@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "echotrace"
+version = "0.1.0"
+description = "Natural-language semantic search and temporal localization for environmental audio."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24", "soundfile>=0.12", "librosa>=0.10", "torch>=2.1", "transformers>=4.40", "streamlit>=1.32", "psutil>=5.9", "PyYAML>=6.0"]
+
+[project.optional-dependencies]
+test = ["pytest>=8.0"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

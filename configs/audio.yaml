@@ -1,0 +1,5 @@
+# Canonical preprocessing settings
+sample_rate: 48000
+channels: 1
+window_seconds: 10.0
+hop_seconds: 5.0

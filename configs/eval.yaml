@@ -1,0 +1,5 @@
+seed: 42
+k_values: [1, 5, 10]
+metrics: [recall_at_k, map]
+log_latency: true
+log_memory: true

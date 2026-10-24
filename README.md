@@ -6,7 +6,7 @@ EchoTrace explores retrieval of relevant environmental audio from text queries u
 
 ## Current status
 
-The Day 1 research and baseline milestone is implemented. Audio can be decoded, downmixed to mono, explicitly resampled to 48 kHz, and split into deterministic overlapping windows that keep their source timestamps. A pinned CLAP wrapper produces audio and text embeddings, and NumPy cosine search and clip-level Recall@K/mAP functions are available.
+The Day 1 research and baseline code is in place. It includes audio decoding, mono downmixing, explicit 48 kHz resampling, deterministic overlapping windows with source timestamps, a pinned CLAP wrapper, NumPy cosine search, and clip-level Recall@K/mAP functions. Window, resampling-logic, ranking, metric, and encoder-guard unit tests pass. The loader test uses a mocked decoder because soundfile was not installed in the local environment; real-file decoding still needs an integration check after dependencies and sample audio are available.
 
 The CPU smoke check completed with 512-dimensional audio and text vectors. Its cosine similarity of 0.500575 compares one synthetic tone with one text query; it is a smoke result, not a retrieval benchmark. The model score is a similarity value, not a probability. No benchmark, deployment, index builder, Streamlit search flow, or validated event-localization result is claimed yet.
 

@@ -35,3 +35,7 @@ No vector database is needed for a few thousand clips. A NumPy matrix multiplica
 4. **Weak retrieval labels and no time labels:** Clotho is suitable for caption retrieval, but missing alternative positives limit interpretation, and it cannot alone validate event localization.
 5. **Source overlap across official splits:** metadata contains repeated Freesound IDs and overlapping excerpt ranges across development, validation, and evaluation. Preserve the official split, disclose this, and report a known-source-disjoint sensitivity subset; some rows cannot be checked because their source ID is unavailable.
 6. **Evaluation time:** Embedding ~4k clips over overlapping windows on CPU may take substantial time. Start with a small development subset, then use free Colab GPU if the measured CPU estimate is too high.
+
+## Validation boundary
+
+The synthetic CLAP smoke run used the pinned checkpoint on CPU and succeeded. Unit tests exercise timestamp boundaries, cosine ranking, clip-level metrics, encoder input guards, and the downmix/resampling calculation. The audio-loader test stubs the decoder: soundfile was not installed in the local environment, and the Clotho audio archives were not downloaded. Verify decoding on a real audio file after installing the pinned dependencies. No index, full retrieval benchmark, temporal annotation evaluation, or deployment has been run.

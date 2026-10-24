@@ -2,14 +2,34 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .venv/
+.venv-*/
 venv/
+.cache/
+work/
 .env
+.streamlit/secrets.toml
 
 data/raw/
 data/processed/
 data/index/
 *.npy
+*.npz
+*.pt
+*.pth
+*.bin
+*.safetensors
 manifest.json
+
+# Raw audio must not be checked in, even outside data/raw.
+*.wav
+*.mp3
+*.flac
+*.ogg
+*.m4a
+*.aac
+
+results/predictions/
+results/embeddings/
 
 .vscode/
 .idea/

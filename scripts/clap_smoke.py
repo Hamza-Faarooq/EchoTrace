@@ -44,7 +44,7 @@ def main() -> int:
         "purpose": "smoke_test_only_not_benchmark",
         "timestamp_utc": datetime.now(timezone.utc).isoformat(),
         "model_id": "laion/clap-htsat-unfused" if Path(args.model).is_dir() else args.model,
-        "loaded_from": args.model,
+        "loaded_from": "local_checkpoint_directory" if Path(args.model).is_dir() else args.model,
         "model_revision": encoder.revision,
         "transformers_version": transformers.__version__,
         "torch_version": torch.__version__,
